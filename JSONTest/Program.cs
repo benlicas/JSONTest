@@ -67,11 +67,7 @@ namespace JSONTest
                             //Parse that string into json object
                             var lv3 = Coral.Data.JSON.Parse(a, false, false, false);
 
-                            string testlv3 = lv3.ToString();
-                            //string test2 = "David D'Ambrosio";
-
-                            //Convert object values to string
-                           //string id = vals["id"].Value.ToString();
+                            //Get the JSON values that we want to plug into the test table.
                             int id = vals["level1id"];
                             string title = vals["title"].Value.ToString();
                             //If any of the names on the list have an apostrophe, we need to convert it to be SQL friendly so '' instead of '
@@ -87,12 +83,11 @@ namespace JSONTest
                             string movie = mv.ToString();
                             string genre = lv3["genre"].Value.ToString();
                             string rating = lv3["rated"].Value.ToString();
-                            //int tt2 = Int32.Parse(instcode); -- if we want to convert to int instead.
                             
                             //Write it out on the console for testing.
                             Console.WriteLine(id + " " + title + " " + name + " " + nickname + " " + gender + " " + yrs + " " + branch + " " + movcode + " " + movie + " " + genre + " " + rating + " " + email);
 
-                            //Insert string data into the custom table
+                            //Insert string/int data into the custom table
                             var query =
                             @"INSERT INTO SystemsFiles.dbo.TestingTable
                             (ID, Name, Title, Nickname, Gender, YearsAtScorpion, Branch, Email, MovieID, MovieName, MovieGenre, MovieRating) VALUES('" +
