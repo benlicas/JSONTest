@@ -16,19 +16,22 @@ namespace JSONTest
         {
             Console.WriteLine("Starting JSON Test!");
 
-            ///Set Variables
+            //Set Variables
             var table = new Topaz.Data.Results.DynamicTable("SystemsFiles.dbo.TestingTable");
             string testFilePath = @"D:\echo\test\";
             string testFile = "TestFile.json";
             string tfile = testFilePath + testFile;
 
-            ///DELETE current Table Results
+            //DELETE current Table Results
+            ///                                                                                   (options, searchBy, filterBy)
             new Topaz.Data.Results.DynamicTable("DELETE FROM SystemsFiles.dbo.TestingTable").Query(null, null, null);
 
-            ///Get JSON File
+            //Get JSON File
             var jres = new StreamReader(tfile).ReadToEnd();
 
-            var tResults = Coral.Data.JSON.Parse(jres, false, false, false);
+            //Parse the JSON
+            ///                                 (string data, throwOnError, strict, decode, strictCommas)
+            var tResults = Coral.Data.JSON.Parse(jres, false, false, false, false);
 
             //Go through each of the JSON rows from the parsed data
             foreach (var row in tResults)
@@ -40,7 +43,7 @@ namespace JSONTest
                 //Convert the child entries into a string
                 var fvnfo = favinfo.ToString();
                 //Parse child entries into JSON object to get level 1 objects
-                var lvl1 = Coral.Data.JSON.Parse(fvnfo, false, false, false);
+                var lvl1 = Coral.Data.JSON.Parse(fvnfo, false, false, false, false);
                 //Go through each of the level 1 rows
                 foreach (var l1 in lvl1)
                 {
@@ -49,7 +52,7 @@ namespace JSONTest
                     //Convert the level 1 rows to strings
                     string l1vals = lv1vals.ToString();
                     //Parse level 1 entries into JSON object to get level 2 objects
-                    var lvl2 = Coral.Data.JSON.Parse(l1vals, false, false, false);
+                    var lvl2 = Coral.Data.JSON.Parse(l1vals, false, false, false, false);
                     //Go through each of the level 2 rows
                     foreach (var l2 in lvl2)
                     {
@@ -65,12 +68,13 @@ namespace JSONTest
                             //Convert array object to string
                             var a = o.ToString();
                             //Parse that string into json object
-                            var lv3 = Coral.Data.JSON.Parse(a, false, false, false);
+                            var lv3 = Coral.Data.JSON.Parse(a, false, false, false, false);
 
                             //Get the JSON values that we want to plug into the test table.
                             int id = vals["level1id"];
                             string title = vals["title"].Value.ToString();
-                            //If any of the names on the list have an apostrophe, we need to convert it to be SQL friendly so '' instead of '
+                            //If any of the names on the list have an apostrophe, we need to convert it to  '' instead of '
+                            //because SQL will error out if the string we're using has a single quote/apostraphe.
                             var nm = Topaz.Safe.ToString(vals["name"].Value).Replace("'", "''");
                             string name = nm.ToString();
                             string nickname = vals["nickname"].Value.ToString();
@@ -79,6 +83,7 @@ namespace JSONTest
                             string branch = vals["branch"].Value.ToString();
                             string email = vals["email"].Value.ToString();
                             string movcode = lv3["movie_code"].Value.ToString();
+                            /// Converts an object to a string data type, catching any null values that wouldn't convert to a string. (Also used on line 75.)
                             var mv = Topaz.Safe.ToString(lv3["movie"].Value).Replace("'", "''");
                             string movie = mv.ToString();
                             string genre = lv3["genre"].Value.ToString();
@@ -92,7 +97,9 @@ namespace JSONTest
                             @"INSERT INTO SystemsFiles.dbo.TestingTable
                             (ID, Name, Title, Nickname, Gender, YearsAtScorpion, Branch, Email, MovieID, MovieName, MovieGenre, MovieRating) VALUES('" +
                             id + "','" + name + "','" + title + "','" + nickname + "','" + gender + "','" + yrs + "','" + branch + "','" + email + "','" + movcode + "','" + movie + "','" + genre + "','" + rating + "')";
-
+                            
+                            //Run the SQL query
+                            ///                                             (options, searchBy, filterBy)
                             new Topaz.Data.Results.DynamicTable(query).Query(null, null, null);
 
                         }
